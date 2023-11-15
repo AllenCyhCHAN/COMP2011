@@ -2,27 +2,24 @@
 #include "lab7.h"
 using namespace std;
 
-// TODO: Reorder the student
-// Parameters:
-// <queue>: An array of pointer to <Student>s.
-// <num_stduents>: the number of students currently in the <queue>
-// Task:
-// Use the <yearOfStudy> member of the <Student> struct to reorder the students.
-// Students at a higher year of study should be ordered in front.
-// You can use bubble sort for the reordering. The detail instruction is on Lab7 webpage.
-void reorder_student(Student *queue[], int num_students)
-{
-  for (int i = 0; i < num_students - 1; i++)
-  {
-    for (int j = 0; j < num_students - i - 1; j++)
-    {
-      if (queue[j]->yearOfStudy < queue[j + 1]->yearOfStudy)
-      {
-        // Swap the positions of queue[j] and queue[j + 1]
-        Student *temp = queue[j];
-        queue[j] = queue[j + 1];
-        queue[j + 1] = temp;
-      }
+void swap_students(Student*& student1, Student*& student2) {
+    Student* temp = student1;
+    student1 = student2;
+    student2 = temp;
+}
+
+void reorder_student(Student* queue[], int num_students) {
+    for (int i = 0; i < num_students - 1; i++) {
+        for (int j = 0; j < num_students - i - 1; j++) {
+            Student& currentStudentRef = *queue[j];
+            Student& nextStudentRef = *queue[j + 1];
+
+            int currentStudentYOS = currentStudentRef.yearOfStudy;
+            int nextStudentYOS = nextStudentRef.yearOfStudy;
+
+            if (currentStudentYOS < nextStudentYOS) {
+                swap_students(queue[j], queue[j + 1]);
+            }
+        }
     }
-  }
 }
