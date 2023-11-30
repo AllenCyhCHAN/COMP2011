@@ -22,4 +22,5 @@ void reorder_student(Student* queue[], int num_students) {
             }
         }
     }
+
 }

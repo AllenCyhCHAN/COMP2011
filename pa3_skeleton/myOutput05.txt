@@ -1,0 +1,88 @@
+=== Simplified USTSPAC System ===
+=== Menu ===
+1: Display student list
+2: Display courses
+3: Display star_ranks of course 
+4: Insert a new student to the student list
+5: Insert a new course to the course list
+6: Insert a new star_rank to the star_rank list
+7: Delete a star_rank by student id and course id
+8: Delete a course by course id
+9: Exit the system
+Enter your option: 
+Enter the course id: 
+Enter a name: 
+Increased course array size to 4
+1 is successfully inserted
+=== Menu ===
+1: Display student list
+2: Display courses
+3: Display star_ranks of course 
+4: Insert a new student to the student list
+5: Insert a new course to the course list
+6: Insert a new star_rank to the star_rank list
+7: Delete a star_rank by student id and course id
+8: Delete a course by course id
+9: Exit the system
+Enter your option: 
+Enter the course id: 
+Enter a name: 
+Increased course array size to 6
+2 is successfully inserted
+=== Menu ===
+1: Display student list
+2: Display courses
+3: Display star_ranks of course 
+4: Insert a new student to the student list
+5: Insert a new course to the course list
+6: Insert a new star_rank to the star_rank list
+7: Delete a star_rank by student id and course id
+8: Delete a course by course id
+9: Exit the system
+Enter your option: 
+Enter the course id: 
+Enter a name: 
+Increased course array size to 8
+3 is successfully inserted
+=== Menu ===
+1: Display student list
+2: Display courses
+3: Display star_ranks of course 
+4: Insert a new student to the student list
+5: Insert a new course to the course list
+6: Insert a new star_rank to the star_rank list
+7: Delete a star_rank by student id and course id
+8: Delete a course by course id
+9: Exit the system
+Enter your option: 
+Enter the student id: 
+Enter a name: 
+1 is successfully inserted
+=== Menu ===
+1: Display student list
+2: Display courses
+3: Display star_ranks of course 
+4: Insert a new student to the student list
+5: Insert a new course to the course list
+6: Insert a new star_rank to the star_rank list
+7: Delete a star_rank by student id and course id
+8: Delete a course by course id
+9: Exit the system
+Enter your option: 
+Enter the student id: 
+Enter a name: 
+2 is successfully inserted
+=== Menu ===
+1: Display student list
+2: Display courses
+3: Display star_ranks of course 
+4: Insert a new student to the student list
+5: Insert a new course to the course list
+6: Insert a new star_rank to the star_rank list
+7: Delete a star_rank by student id and course id
+8: Delete a course by course id
+9: Exit the system
+Enter your option: 
+Enter the student id: 
+Enter the course id: 
+Enter the star rank of this course: 
