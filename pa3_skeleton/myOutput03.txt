@@ -13,7 +13,6 @@ Enter your option:
 Enter the course id: 
 Enter a name: 
 1 is successfully inserted
-1 is successfully inserted
 === Menu ===
 1: Display student list
 2: Display courses

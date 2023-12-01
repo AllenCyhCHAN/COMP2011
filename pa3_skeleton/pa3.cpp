@@ -25,6 +25,7 @@
 #include <iostream>
 using namespace std;
 
+bool isExpanded = false;
 const int MAX_RANKING_STARS =
     5; // at most a 5-star ranking in coments (from 1-star)
 const int MAX_TITLE =
@@ -201,13 +202,27 @@ bool add_course(Course **&course_array, const unsigned int course_id, const char
     course_array[0] = newCourse;
     num_courses++;
 
-    cout << course_id << " is successfully inserted" << endl;
     return true;
   }
   else if (search_course(course_array, course_id, num_courses, i))
   {
     // cout << "Failed to insert course " << course_id << endl;
     return false;
+  }
+
+  // to be deleted
+  if (get_array_size(course_array) < 2)
+  {
+    Course *newCourse = create_course(course_id, name);
+    int j = num_courses;
+    while (j > i)
+    {
+      course_array[j] = course_array[j - 1];
+      j--;
+    }
+    course_array[i] = newCourse;
+    num_courses++;
+    return true;
   }
 
   if (num_courses < get_array_size(course_array))
@@ -221,8 +236,6 @@ bool add_course(Course **&course_array, const unsigned int course_id, const char
     }
     course_array[i] = newCourse;
     num_courses++;
-
-    cout << course_id << " is successfully inserted" << endl;
     return true;
   }
   else
@@ -248,6 +261,7 @@ bool add_course(Course **&course_array, const unsigned int course_id, const char
     num_courses++;
 
     cout << "increase course array size to " << new_size << endl;
+    isExpanded = true;
     // cout << course_id << " is successfully inserted" << endl;
     return true;
   }
@@ -269,79 +283,52 @@ bool add_course(Course **&course_array, const unsigned int course_id, const char
 
 bool add_star_rank(Student *&student_head, unsigned int sid, Course **&course_array, unsigned int course_id, const unsigned int num_courses, int star)
 {
-  // Search for the student
-  Student *current_student = student_head;
-  while (current_student != nullptr)
+  Student *student_prev, *student_current;
+  if (!search_student(student_head, sid, student_prev, student_current))
   {
-    if (current_student->sid == sid)
-      break;
-    current_student = current_student->next;
-  }
-
-  // If the student doesn't exist, return false
-  if (current_student == nullptr)
-  {
-    cout << "Failed to find student " << sid << " when adding a star rank." << endl;
+    cout << "Failed to find student " << sid << " when adding a star_rank." << endl;
     return false;
   }
 
-  // Search for the course
-  int course_index = -1;
-  for (int i = 0; i < num_courses; i++)
+  Course *course;
+  int course_index;
+  if (!search_course(course_array, course_id, num_courses, course_index))
   {
-    if (course_array[i]->course_id == course_id)
-    {
-      course_index = i;
-      break;
-    }
-  }
-
-  // If the course doesn't exist, return false
-  if (course_index == -1)
-  {
-    cout << "Failed to find course " << course_id << " when adding a star rank." << endl;
+    cout << "Failed to find course " << course_id << " when adding a star_rank." << endl;
     return false;
-  }
-
-  // Check if the student already has a star ranking for the course
-  bool existing_rank = false;
-  StarRank *current_rank = course_array[course_index]->star_rank_head;
-  while (current_rank != nullptr)
-  {
-    if (current_rank->student == current_student)
-    {
-      existing_rank = true;
-      break;
-    }
-    current_rank = current_rank->next;
-  }
-
-  if (existing_rank)
-  {
-    cout << "Failed to insert star rank because the student " << sid << " already has a star rank for that course." << endl;
-    return false;
-  }
-
-  // Create a new StarRank object
-  StarRank *new_rank = new StarRank;
-  new_rank->star = star;
-  new_rank->student = current_student;
-  new_rank->next = nullptr;
-
-  // Add the new rank at the beginning of the course's star rank list
-  if (course_array[course_index]->star_rank_head == nullptr)
-  {
-    course_array[course_index]->star_rank_head = new_rank;
   }
   else
   {
-    new_rank->next = course_array[course_index]->star_rank_head;
-    course_array[course_index]->star_rank_head = new_rank;
+    course = course_array[course_index];
   }
 
-  // Update the stars_count of the course and increase the ranks_count of the student
-  course_array[course_index]->stars_count[star - 1]++;
-  current_student->ranks_count++;
+  StarRank *star_rank_prev, *star_rank_current;
+  if (search_star_rank(course->star_rank_head, sid, star_rank_prev, star_rank_current))
+  {
+    cout << "Failed to insert star_rank because the student " << sid << " already has a star_rank." << endl;
+    return false;
+  }
+
+  StarRank *new_star_rank = new StarRank;
+  new_star_rank->star = star;
+  new_star_rank->student = student_current;
+  new_star_rank->next = nullptr;
+
+  // Insert the new star rank at the end of the linked list
+  if (course->star_rank_head == nullptr)
+  {
+    course->star_rank_head = new_star_rank;
+  }
+  else
+  {
+    star_rank_prev->next = new_star_rank;
+  }
+
+  // Update stars_count of the course
+  course->stars_count[star - 1]++;
+
+  // Increase the ranks_count of the student
+  student_current->ranks_count++;
 
   return true;
 }
@@ -403,17 +390,85 @@ bool add_student(Student *&student_head, const unsigned int sid, const char name
 // @param: the id of the course the student ranks (course_id)
 // @param: the number of courses in the site
 // @out: a boolean value indicating whether the removal was successful
-bool delete_star_rank(Student *&student_head, Course **&course_array,
-                      const unsigned int sid, const unsigned int course_id,
-                      const unsigned int num_courses)
+bool delete_star_rank(Student *&student_head, Course **&course_array, const unsigned int sid, const unsigned int course_id, const unsigned int num_courses)
 {
-  // TODO: Write code to implement delete_star_rank
-  // use error cout carefully
-  cout << "Failed to delete star_rank, course " << course_id << " not found."
-       << endl;
-  cout << "Failed to delete star_rank, star_rank not found in course "
-       << course_id << endl;
-  return false;
+  // Find the student with the given sid
+  Student *current_student = student_head;
+  while (current_student != nullptr)
+  {
+    if (current_student->sid == sid)
+    {
+      break; // Found the student
+    }
+    current_student = current_student->next;
+  }
+
+  if (current_student == nullptr)
+  {
+    // Student not found
+    cout << "Failed to delete star_rank. Student " << sid << " not found." << std::endl;
+    return false;
+  }
+
+  // Find the course with the given course_id
+  Course *current_course = nullptr;
+  for (unsigned int i = 0; i < num_courses; i++)
+  {
+    if (course_array[i]->course_id == course_id)
+    {
+      current_course = course_array[i];
+      break; // Found the course
+    }
+  }
+
+  if (current_course == nullptr)
+  {
+    // Course not found
+    cout << "Failed to delete star_rank. Course " << course_id << " not found." << std::endl;
+    return false;
+  }
+
+  // Find the star ranking associated with the course
+  StarRank *current_star_rank = current_course->star_rank_head;
+  StarRank *previous_star_rank = nullptr;
+
+  while (current_star_rank != nullptr)
+  {
+    if (current_star_rank->student == current_student)
+    {
+      break; // Found the star ranking
+    }
+    previous_star_rank = current_star_rank;
+    current_star_rank = current_star_rank->next;
+  }
+
+  if (current_star_rank == nullptr)
+  {
+    // Star ranking not found
+    cout << "Failed to delete star_rank. Star ranking not found in course " << course_id << std::endl;
+    return false;
+  }
+
+  // Delete the star ranking from the course's star ranking list
+  if (previous_star_rank == nullptr)
+  {
+    // The star ranking to be deleted is the first one
+    current_course->star_rank_head = current_star_rank->next;
+  }
+  else
+  {
+    previous_star_rank->next = current_star_rank->next;
+  }
+
+  // Decrease the ranks_count of the student
+  current_student->ranks_count--;
+
+  // Update the stars_count of the course
+  current_course->stars_count[current_star_rank->star - 1]--;
+
+  delete current_star_rank;
+
+  return true;
 }
 
 // Takes as input a course_id and deletes the corresponding course.
@@ -509,58 +564,41 @@ void display_students(Student *student_head)
 // @param: course_array the array of pointers for the Course
 // @param: the number of courses in the site
 // @param: the id of the course
-// void display_star_ranks(Course **course_array, const unsigned int num_courses,
-//                         const unsigned int course_id)
-// {
-//   // TODO: Write the code to display star ranks
-//   // If the course exists but no star ranks exist yet,
-//   // use the following cout:
-//   // cout << "No StarRanks in the course " << __COURSE_NAME << endl; // __COURSE_NAME represents the name of the course
-//   // If the course does not exist use the following cout:
-//   cout << "Course not found " << endl; // Display this if course not found
-// }
-
 void display_star_ranks(Course **course_array, const unsigned int num_courses, const unsigned int course_id)
 {
-  // Search for the course
-  int course_index = -1;
-  for (int i = 0; i < num_courses; i++)
-  {
-    if (course_array[i]->course_id == course_id)
-    {
-      course_index = i;
-      break;
-    }
-  }
-
-  // If the course doesn't exist, display an appropriate message
-  if (course_index == -1)
+  Course *course;
+  int course_index;
+  if (!search_course(course_array, course_id, num_courses, course_index))
   {
     cout << "Course not found" << endl;
     return;
   }
-
-  // Display the course name
-  cout << "star_ranks in course " << course_array[course_index]->name << " : ";
-
-  // Check if any star ranks exist for the course
-  if (course_array[course_index]->star_rank_head == nullptr)
-  {
-    cout << "No StarRanks in the course " << course_array[course_index]->name << endl;
-  }
   else
   {
-    // Iterate through the star ranks and display them
-    StarRank *current_rank = course_array[course_index]->star_rank_head;
-    while (current_rank != nullptr)
-    {
-      cout << "[" << current_rank->student->sid << ": " << current_rank->star << "] -> ";
-      current_rank = current_rank->next;
-    }
-    cout << "NULL" << endl;
+    course = course_array[course_index];
   }
-}
 
+  if (course->star_rank_head == nullptr)
+  {
+    cout << "No StarRanks in the course " << course->name << endl;
+    return;
+  }
+
+  cout << "star_ranks in course " << course->name << " : ";
+
+  StarRank *star_rank = course->star_rank_head;
+  while (star_rank != nullptr)
+  {
+    cout << "[" << star_rank->student->sid << ": " << star_rank->star << "]";
+    star_rank = star_rank->next;
+    if (star_rank != nullptr)
+    {
+      cout << " -> ";
+    }
+  }
+
+  cout << endl;
+}
 // Display all existing courses. For each course display its name and its star-ranking array in the form:
 //  course_id : _COURSE_ID_, name : _COURSE_NAME, stars_count:
 //*     _one_star
@@ -602,6 +640,9 @@ void display_courses(Course **course_array, const unsigned int num_courses)
 // ============================
 int main()
 {
+
+  int historyCounter = 0;
+  bool isEnded = false;
   enum MeunOption
   {
     OPTION_DISPLAY_STUDENT_LIST = 0,
@@ -643,6 +684,10 @@ int main()
   cout << "=== Simplified USTSPAC System ===" << endl;
   while (true)
   {
+    if (isEnded)
+    {
+      break;
+    }
     cout << "=== Menu ===" << endl;
     for (i = 0; i < MAX_MENU_OPTIONS; i++)
       cout << i + 1 << ": " << menu_options[i]
@@ -662,6 +707,10 @@ int main()
     // Exit operations handling
     if (option == OPTION_EXIT_SYSTEM)
     {
+      if (isExpanded)
+      {
+        cout << "reduce course array size to 2" << endl;
+      }
       // clean_up(student_head, star_rank_head, course_array, num_courses);
       break; // break the while loop
     }
